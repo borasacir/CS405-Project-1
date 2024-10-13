@@ -161,13 +161,15 @@ function getChatGPTModelViewMatrix() {
  * stated in transformation-prompt.txt
  */
 function getModelViewMatrix() {
-    const transformationMatrix1 = createIdentityMatrix();
     
-    const transformationMatrix2 = multiplyMatrices(createTranslationMatrix(0.3, -0.25, 0), transformationMatrix1);
+    const rad = (angle) => angle * Math.PI / 180
+    
+    
+    const transformationMatrix2 = createTranslationMatrix(0.3, -0.25, 0);
     const transformationMatrix3 = multiplyMatrices(createScaleMatrix(0.5, 0.5, 1), transformationMatrix2);
-    const transformationMatrix4 = multiplyMatrices(createRotationMatrix_X(0.5235987756), transformationMatrix3);
-    const transformationMatrix5 = multiplyMatrices(createRotationMatrix_Y(0.7853981634), transformationMatrix4);
-    const transformationMatrix6 = multiplyMatrices(createRotationMatrix_Z(1.0471975512), transformationMatrix5);
+    const transformationMatrix4 = multiplyMatrices(createRotationMatrix_X(rad(30)), transformationMatrix3);
+    const transformationMatrix5 = multiplyMatrices(createRotationMatrix_Y(rad(45)), transformationMatrix4);
+    const transformationMatrix6 = multiplyMatrices(createRotationMatrix_Z(rad(60)), transformationMatrix5);
     return transformationMatrix6;
 }
 
@@ -185,28 +187,31 @@ function getPeriodicMovement(startTime) {
     const currentTime = Date.now();
     const elapsedTime = (currentTime - startTime) % period;
     
-    let t = elapsedTime / halfPeriod;
-    if (t > 1) {
-        t = 2 - t; // Reverse direction for the second half of the period
+    let t;
+    if (elapsedTime < halfPeriod) {
+        t = elapsedTime / halfPeriod; // Forward transformation (0 to 1)
+    } else {
+        t = (period - elapsedTime) / halfPeriod; // Backward transformation (1 to 0)
     }
 
-    const transformationMatrix1 = createIdentityMatrix();
-    const transformationMatrix2 = interpolateMatrices(transformationMatrix1, createTranslationMatrix(0.3, -0.25, 0), t);
-    const transformationMatrix3 = interpolateMatrices(transformationMatrix2, createScaleMatrix(0.5, 0.5, 1), t);
-    const transformationMatrix4 = interpolateMatrices(transformationMatrix3, createRotationMatrix_X(0.5235987756), t);
-    const transformationMatrix5 = interpolateMatrices(transformationMatrix4, createRotationMatrix_Y(0.7853981634), t);
-    const transformationMatrix6 = interpolateMatrices(transformationMatrix5, createRotationMatrix_Z(1.0471975512), t);
-    
-    return transformationMatrix6;
-}
+    const identityMatrix = [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ];
 
-function interpolateMatrices(matrixA, matrixB, t) {
+    const rad = (angle) => angle * Math.PI / 180;
+    const transformationMatrix2 = createTranslationMatrix(0.3, -0.25, 0);
+    const transformationMatrix3 = multiplyMatrices(createScaleMatrix(0.5, 0.5, 1), transformationMatrix2);
+    const transformationMatrix4 = multiplyMatrices(createRotationMatrix_X(rad(30)), transformationMatrix3);
+    const transformationMatrix5 = multiplyMatrices(createRotationMatrix_Y(rad(45)), transformationMatrix4);
+    const targetMatrix = multiplyMatrices(createRotationMatrix_Z(rad(60)), transformationMatrix5);
+
     const result = new Float32Array(16);
     for (let i = 0; i < 16; i++) {
-        result[i] = matrixA[i] * (1 - t) + matrixB[i] * t;
+        result[i] = identityMatrix[i] * (1 - t) + targetMatrix[i] * t;
     }
+
     return result;
 }
-
-
-
