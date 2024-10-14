@@ -162,14 +162,16 @@ function getChatGPTModelViewMatrix() {
  */
 function getModelViewMatrix() {
     
+    
+
     const rad = (angle) => angle * Math.PI / 180
     
     
     const transformationMatrix2 = createTranslationMatrix(0.3, -0.25, 0);
-    const transformationMatrix3 = multiplyMatrices(createScaleMatrix(0.5, 0.5, 1), transformationMatrix2);
-    const transformationMatrix4 = multiplyMatrices(createRotationMatrix_X(rad(30)), transformationMatrix3);
-    const transformationMatrix5 = multiplyMatrices(createRotationMatrix_Y(rad(45)), transformationMatrix4);
-    const transformationMatrix6 = multiplyMatrices(createRotationMatrix_Z(rad(60)), transformationMatrix5);
+    const transformationMatrix3 = multiplyMatrices(transformationMatrix2, createScaleMatrix(0.5, 0.5, 1));
+    const transformationMatrix4 = multiplyMatrices(transformationMatrix3, createRotationMatrix_X(rad(30)));
+    const transformationMatrix5 = multiplyMatrices(transformationMatrix4, createRotationMatrix_Y(rad(45)));
+    const transformationMatrix6 = multiplyMatrices(transformationMatrix5, createRotationMatrix_Z(rad(60)));
     return transformationMatrix6;
 }
 
@@ -203,10 +205,10 @@ function getPeriodicMovement(startTime) {
 
     const rad = (angle) => angle * Math.PI / 180;
     const transformationMatrix2 = createTranslationMatrix(0.3, -0.25, 0);
-    const transformationMatrix3 = multiplyMatrices(createScaleMatrix(0.5, 0.5, 1), transformationMatrix2);
-    const transformationMatrix4 = multiplyMatrices(createRotationMatrix_X(rad(30)), transformationMatrix3);
-    const transformationMatrix5 = multiplyMatrices(createRotationMatrix_Y(rad(45)), transformationMatrix4);
-    const targetMatrix = multiplyMatrices(createRotationMatrix_Z(rad(60)), transformationMatrix5);
+    const transformationMatrix3 = multiplyMatrices(transformationMatrix2, createScaleMatrix(0.5, 0.5, 1));
+    const transformationMatrix4 = multiplyMatrices(transformationMatrix3, createRotationMatrix_X(rad(30)));
+    const transformationMatrix5 = multiplyMatrices(transformationMatrix4, createRotationMatrix_Y(rad(45)));
+    const targetMatrix = multiplyMatrices(transformationMatrix5, createRotationMatrix_Z(rad(60)));
 
     const result = new Float32Array(16);
     for (let i = 0; i < 16; i++) {
